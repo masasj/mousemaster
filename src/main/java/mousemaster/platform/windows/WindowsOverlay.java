@@ -37,6 +37,8 @@ public class WindowsOverlay implements Overlay {
     private boolean mousePositionMissing;
     private GridRenderer gridRenderer;
     private WinDef.HWND gridHwnd;
+    private EffectRenderer effectRenderer;
+    private WinDef.HWND effectHwnd;
     /** Owns no QWidget, so it can be created eagerly (no QtJambi native-load ordering). */
     private final HintMeshRenderer hintMeshRenderer;
     private WinDef.HWND zoomHwnd;
@@ -198,6 +200,8 @@ public class WindowsOverlay implements Overlay {
                 hwnds.add(hwnd(window));
         if (indicatorHwnd != null && indicatorRenderer.showing())
             hwnds.add(indicatorHwnd);
+        if (effectHwnd != null && effectRenderer.showing())
+            hwnds.add(effectHwnd);
         if (zoomHwnd != null)
             hwnds.add(zoomHwnd);
         if (hwnds.isEmpty())
@@ -481,6 +485,8 @@ public class WindowsOverlay implements Overlay {
             ExtendedUser32.INSTANCE.SetWindowDisplayAffinity(gridHwnd, affinity);
         if (indicatorHwnd != null)
             ExtendedUser32.INSTANCE.SetWindowDisplayAffinity(indicatorHwnd, affinity);
+        if (effectHwnd != null)
+            ExtendedUser32.INSTANCE.SetWindowDisplayAffinity(effectHwnd, affinity);
     }
 
     private WinDef.LRESULT zoomWindowCallback(WinDef.HWND hwnd, int uMsg,
@@ -499,6 +505,34 @@ public class WindowsOverlay implements Overlay {
         }
         if (indicatorRenderer != null)
             indicatorRenderer.hide(allowFade);
+    }
+
+    @Override
+    public void setEffects(List<EffectFrame> effectFrames) {
+        boolean firstCreation = effectHwnd == null;
+        if (firstCreation) {
+            effectRenderer = new EffectRenderer();
+            effectHwnd = new WinDef.HWND(new Pointer(effectRenderer.widget().winId()));
+            applyOverlayExStyles(effectHwnd);
+        }
+        WinDef.POINT mousePosition = mouse.findMousePosition();
+        if (mousePosition == null) {
+            logger.warn("Unable to find mouse position for effects");
+            return;
+        }
+        boolean wasShowing = effectRenderer.showing();
+        effectRenderer.setEffects(effectFrames, mousePosition.x, mousePosition.y,
+                WindowsScreen.findActiveScreen(mousePosition).scale());
+        if (!wasShowing)
+            setTopmost();
+        if (firstCreation)
+            updateCaptureExclusions();
+    }
+
+    @Override
+    public void hideEffects() {
+        if (effectRenderer != null)
+            effectRenderer.hide();
     }
 
     @Override
