@@ -201,8 +201,8 @@ public class WindowsOverlay implements Overlay {
             (hintMeshRenderer.showing() ? hwnds : notTopmostHwnds).add(hwnd(window));
         if (indicatorHwnd != null && indicatorRenderer.showing())
             hwnds.add(indicatorHwnd);
-        if (effectHwnd != null && effectRenderer.showing())
-            hwnds.add(effectHwnd);
+        if (effectHwnd != null)
+            (effectRenderer.showing() ? hwnds : notTopmostHwnds).add(effectHwnd);
         if (zoomHwnd != null)
             (currentZoom != null ? hwnds : notTopmostHwnds).add(zoomHwnd);
         // The shell demotes the taskbar under a topmost window that covers a screen.
