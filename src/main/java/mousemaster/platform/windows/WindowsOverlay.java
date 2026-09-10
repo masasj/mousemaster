@@ -319,15 +319,20 @@ public class WindowsOverlay implements Overlay {
         preWarmZoomWindow();
         if (effectHwnd == null) {
             long beforeEffect = System.nanoTime();
+            System.err.println("[diag] createEffectWindow: begin"); System.err.flush();
             createEffectWindow();
+            System.err.println("[diag] createEffectWindow: end"); System.err.flush();
             logger.debug("Pre-warmed the effect window in " +
                          (long) ((System.nanoTime() - beforeEffect) / 1e6) + "ms");
         }
         if (indicatorHwnd != null)
             return;
         long before = System.nanoTime();
+        System.err.println("[diag] createIndicatorWindow: begin"); System.err.flush();
         createIndicatorWindow();
+        System.err.println("[diag] createIndicatorWindow: end, preWarm begin"); System.err.flush();
         indicatorRenderer.preWarm();
+        System.err.println("[diag] indicator preWarm: end"); System.err.flush();
         logger.debug("Pre-warmed the indicator window in " +
                     (long) ((System.nanoTime() - before) / 1e6) + "ms");
     }
@@ -533,9 +538,15 @@ public class WindowsOverlay implements Overlay {
     private void createEffectWindow() {
         if (effectRenderer == null)
             effectRenderer = new EffectRenderer();
-        effectHwnd = new WinDef.HWND(new Pointer(effectRenderer.window().winId()));
+        System.err.println("[diag] effect renderer constructed"); System.err.flush();
+        TransparentWindow effectWindow = effectRenderer.window();
+        System.err.println("[diag] effect window + widget constructed"); System.err.flush();
+        effectHwnd = new WinDef.HWND(new Pointer(effectWindow.winId()));
+        System.err.println("[diag] effect winId ok"); System.err.flush();
         applyOverlayExStyles(effectHwnd);
+        System.err.println("[diag] effect ex styles ok"); System.err.flush();
         updateCaptureExclusions();
+        System.err.println("[diag] effect capture exclusions ok"); System.err.flush();
     }
 
     private int effectFrameCount;

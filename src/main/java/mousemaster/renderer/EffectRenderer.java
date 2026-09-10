@@ -53,8 +53,11 @@ public final class EffectRenderer {
     /** Lazily creates the window and its widget; the host styles winId() afterwards. */
     public TransparentWindow window() {
         if (window == null) {
+            System.err.println("[diag] new TransparentWindow (effect)"); System.err.flush();
             window = new TransparentWindow();
+            System.err.println("[diag] new EffectWidget"); System.err.flush();
             widget = new EffectWidget(window);
+            System.err.println("[diag] EffectWidget constructed"); System.err.flush();
         }
         return window;
     }

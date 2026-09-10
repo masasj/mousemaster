@@ -219,15 +219,19 @@ public class WindowsPlatform implements Platform {
                 overlay.flushCache();
             }
             overlay.preWarmFontsAndWindows(newHintMeshConfigurations);
+            System.err.println("[diag] preWarmFontsAndWindows done"); System.err.flush();
         }
         this.modeMap = newModeMap;
+        System.err.println("[diag] notifying mouse position listeners"); System.err.flush();
         WinDef.POINT mousePosition = mouse.findMousePosition();
         mousePositionListeners.forEach(
                 mousePositionListener -> mousePositionListener.mouseMoved(mousePosition.x,
                         mousePosition.y));
+        System.err.println("[diag] mouse position listeners notified"); System.err.flush();
         overlay.setMessagePump(this::pumpEvents);
         if (keyboardHookCallback == null)
             installHooks();
+        System.err.println("[diag] hooks installed"); System.err.flush();
     }
 
     /**
